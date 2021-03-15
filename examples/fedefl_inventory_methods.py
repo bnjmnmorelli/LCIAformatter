@@ -1,25 +1,20 @@
-import logging as log
-import os
 import lciafmt
 import fedelemflowlist as fedefl
+from lciafmt.util import store_method, save_json, log
+
+
+method = lciafmt.Method.FEDEFL_INV
 
 def main():
 
-    modulepath = os.path.dirname(
-        os.path.realpath(__file__)).replace('\\', '/')
-    outputpath = modulepath + '/../output/'
-    os.makedirs(outputpath, exist_ok=True)
-    
-    print(list(fedefl.subset_list.subsets))
+    log.debug('Subsets available: ' + ", ".join(map(str, fedefl.subset_list.get_subsets())))
+
     subsets = None
-    
-    log.basicConfig(level=log.INFO)
+
     inventory_methods = lciafmt.get_method(method_id='FEDEFL Inventory',subset=subsets)
-    inventory_methods.to_csv(outputpath+'FEDEFL_inventory_methods.csv', index=False)
-    json_pack = outputpath+"inventory_method_json.zip"
-    if os.path.exists(json_pack):
-        os.remove(json_pack)
-    #lciafmt.to_jsonld(inventory_methods, json_pack)
+    
+    store_method(inventory_methods, method)
+    save_json(method, inventory_methods)
     
 if __name__ == "__main__":
     main()
